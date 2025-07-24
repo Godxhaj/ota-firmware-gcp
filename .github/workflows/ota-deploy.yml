@@ -23,7 +23,7 @@ jobs:
       - name: Upload .bin files to GCS
         run: |
           for file in firmware/**/*.bin; do
-            gsutil cp "$file" gs://$GCS_BUCKET_NAME/firmware/
+            gsutil cp "$file" gs://${{ GCS_BUCKET_NAME }}/firmware/
           done
         env:
           GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
