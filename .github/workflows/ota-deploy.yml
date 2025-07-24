@@ -26,7 +26,7 @@ jobs:
         run: |
           for file in firmware/**/*.bin; do
             echo "Uploading $file to gs://$GCS_BUCKET_NAME/firmware/"
-            gsutil cp "$file" "gs://$GCS_BUCKET_NAME/firmware/"
+            gsutil cp "$file" "gs://ota-firmware-bucket/firmware/"
           done
 
       - name: Publish Pub/Sub message
