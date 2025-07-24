@@ -2,8 +2,6 @@ name: Firmware Upload
 
 on:
   push:
-    paths:
-      - 'firmware/**/*.bin'
 
 jobs:
   upload-and-publish:
