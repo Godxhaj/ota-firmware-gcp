@@ -20,3 +20,18 @@ resource "google_project_iam_member" "github_sa_storage_admin" {
   role    = "roles/storage.objectAdmin"
   member  = "serviceAccount:github-ci@iot123project.iam.gserviceaccount.com"
 }
+
+
+resource "google_pubsub_subscription" "ota_subscription" {
+  name  = "ota-sub"
+  topic = google_pubsub_topic.ota_updates.name
+
+  ack_deadline_seconds        = 20
+  message_retention_duration  = "604800s"
+}
+
+resource "google_project_iam_member" "github_sa_pubsub_publisher" {
+  project = "iot123project"
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:github-ci@iot123project.iam.gserviceaccount.com"
+}
