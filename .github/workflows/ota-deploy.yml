@@ -21,12 +21,10 @@ jobs:
           export_default_credentials: true
 
       - name: Upload .bin files to GCS
-        env:
-          GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
         run: |
           for file in firmware/**/*.bin; do
-            echo "Uploading $file to gs://$GCS_BUCKET_NAME/firmware/"
-            gsutil cp "$file" "gs://ota-firmware-bucket/firmware/"
+            echo "Uploading $file to gs://ota-firmware-bucket/firmware/"
+            gsutil cp "$file" gs://ota-firmware-bucket/firmware/
           done
 
       - name: Publish Pub/Sub message
