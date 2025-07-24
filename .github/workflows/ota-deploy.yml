@@ -1,37 +1,44 @@
-name: Firmware Upload
+name: OTA Firmware Upload
 
 on:
   push:
+    branches:
+      - master  # or main or any other branch you want
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
 
 jobs:
-  upload-and-publish:
+  upload:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: iot123project  # 👈 or use ${{ secrets.GCP_PROJECT_ID }} if you prefer secrets
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        install_components: gsutil
 
-      - name: Upload .bin files to GCS
-        run: |
-          for file in firmware/**/*.bin; do
-            echo "Uploading $file to gs://ota-firmware-bucket/firmware/"
-            gsutil cp "$file" gs://ota-firmware-bucket/firmware/
-          done
+    - name: Upload .bin files to GCS
+      run: |
+        for file in firmware/**/*.bin; do
+          echo "Uploading $file to gs://${BUCKET_NAME}/firmware/"
+          gsutil cp "$file" gs://${BUCKET_NAME}/firmware/
+        done
 
-      - name: Publish Pub/Sub message
-        run: |
-          for file in firmware/**/*.bin; do
-            FILE_NAME=$(basename "$file")
-            gcloud pubsub topics publish ota-updates \
-              --message="{\"firmware\":\"$FILE_NAME\",\"timestamp\":\"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}"
-          done
+    - name: Publish to Pub/Sub
+      run: |
+        for file in firmware/**/*.bin; do
+          FILE_NAME=$(basename "$file")
+          gcloud pubsub topics publish ota-updates \
+            --message="{\"firmware\":\"$FILE_NAME\",\"timestamp\":\"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}"
+        done
