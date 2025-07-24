@@ -25,7 +25,7 @@ jobs:
           GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
         run: |
           for file in firmware/**/*.bin; do
-	    echo" Upoading $file to gs://$GCS_BUCKET_NAME/firmware/'
+	    echo "Upoading $file to gs://$GCS_BUCKET_NAME/firmware/'
             gsutil cp "$file" gs://$GCS_BUCKET_NAME/firmware/
           done
 
