@@ -21,12 +21,12 @@ jobs:
           export_default_credentials: true
 
       - name: Upload .bin files to GCS
-        run: |
-          for file in firmware/**/*.bin; do
-            gsutil cp "$file" gs://${{ GCS_BUCKET_NAME }}/firmware/
-          done
         env:
           GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+        run: |
+          for file in firmware/**/*.bin; do
+            gsutil cp "$file" gs://$GCS_BUCKET_NAME/firmware/
+          done
 
       - name: Publish Pub/Sub message
         run: |
